@@ -23,7 +23,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body className={inter.className}>
         <main>
-          <UserProvider session={user}>{children}</UserProvider>
+          <UserProvider session={{ user }}>{children}</UserProvider>
         </main>
       </body>
     </html>
