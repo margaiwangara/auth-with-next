@@ -1,10 +1,43 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMount } from 'react-use';
 
 import { useUserContext } from '@store/ctx';
+import { getCurrentUser, logoutUser } from '@services/auth';
 
 export default function NavBar() {
-  const { user } = useUserContext();
+  const { user, setUser } = useUserContext();
+
+  const router = useRouter();
+
+  const logout = async () => {
+    try {
+      await logoutUser();
+      router.replace('/login');
+    } catch (error) {
+      console.log('error', error);
+    }
+  };
+
+  // get current user
+  const fetchCurrentUser = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+
+      if (currentUser) {
+        setUser(currentUser);
+        return;
+      }
+
+      router.replace('/login');
+    } catch (error) {
+      setUser(null);
+      router.replace('/login');
+    }
+  };
+
+  useMount(() => user || fetchCurrentUser());
 
   return (
     <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
@@ -14,14 +47,12 @@ export default function NavBar() {
         </Link>
         <ul className="navbar-nav ml-auto">
           <li className="nav-item">
-            <Link href="/" className="nav-link">
-              {user?.name}
-            </Link>
+            <button className="nav-link">{user?.name}</button>
           </li>
           <li className="nav-item">
-            <Link href="/logout" className="nav-link">
+            <button className="nav-link" onClick={logout}>
               Logout
-            </Link>
+            </button>
           </li>
         </ul>
       </div>

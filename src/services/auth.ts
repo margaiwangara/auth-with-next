@@ -34,3 +34,12 @@ export async function getCurrentUser() {
     return null;
   }
 }
+
+export async function logoutUser() {
+  try {
+    await apiRequest('POST', '/api/auth/logout');
+    return null;
+  } catch (error) {
+    return error;
+  }
+}
