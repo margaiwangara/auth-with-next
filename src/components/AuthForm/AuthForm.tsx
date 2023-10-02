@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { loginUser, registerUser } from '@services/auth';
+import { getCurrentUser, loginUser, registerUser } from '@services/auth';
+import { useUserContext } from '@store/ctx';
 
 type PageProps = 'login' | 'register';
 
@@ -19,6 +20,8 @@ export default function AuthForm({ page = 'login' }: AuthFormProps) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const { setUser } = useUserContext();
 
   const router = useRouter();
 
@@ -40,13 +43,22 @@ export default function AuthForm({ page = 'login' }: AuthFormProps) {
       if (data?.detail) {
         setError(
           page === 'login'
-            ? 'Invalid email or password'
+            ? 'Invalid credentials'
             : 'Oops! Something went wrong',
         );
         setLoading(false);
         return;
       }
 
+      // get current user and add to context
+      const currentUser = await getCurrentUser();
+
+      if (!currentUser) {
+        setError('Invalid credentials');
+        return;
+      }
+
+      setUser(currentUser);
       setLoading(false);
       router.replace('/');
     } catch (error) {

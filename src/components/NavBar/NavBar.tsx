@@ -1,10 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMount } from 'react-use';
 
 import { useUserContext } from '@store/ctx';
-import { getCurrentUser, logoutUser } from '@services/auth';
+import { logoutUser } from '@services/auth';
 
 export default function NavBar() {
   const { user, setUser } = useUserContext();
@@ -19,25 +18,6 @@ export default function NavBar() {
       console.log('error', error);
     }
   };
-
-  // get current user
-  const fetchCurrentUser = async () => {
-    try {
-      const currentUser = await getCurrentUser();
-
-      if (currentUser) {
-        setUser(currentUser);
-        return;
-      }
-
-      router.replace('/login');
-    } catch (error) {
-      setUser(null);
-      router.replace('/login');
-    }
-  };
-
-  useMount(() => user || fetchCurrentUser());
 
   return (
     <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
