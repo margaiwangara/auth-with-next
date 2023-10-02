@@ -1,9 +1,8 @@
 export type UserProps = {
   id: string;
-  username: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  image: string;
+  role: string;
+  is_confirmed: boolean;
+  created_at: string;
 };

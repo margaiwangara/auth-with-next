@@ -1,6 +1,13 @@
-import { AuthForm } from '@components/ui';
+import { redirect } from 'next/navigation';
 
-export default function Login() {
+import { AuthForm } from '@components/ui';
+import { getCurrentUser } from '@services/auth';
+
+export default async function Login() {
+  const user = await getCurrentUser();
+
+  if (user) redirect('/');
+
   return (
     <section className="container">
       <div className="row mt-md-5 mt-sm-3">

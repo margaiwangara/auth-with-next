@@ -25,3 +25,12 @@ export async function registerUser(userInput: RegisterRequestInputProps) {
     return error;
   }
 }
+
+export async function getCurrentUser() {
+  try {
+    const user = await apiRequest('GET', '/api/auth/current-user');
+    return Object.keys(user || {}).length ? user : null;
+  } catch (error) {
+    return null;
+  }
+}

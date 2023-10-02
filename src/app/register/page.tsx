@@ -1,6 +1,12 @@
-import { AuthForm } from '@components/ui';
+import { redirect } from 'next/navigation';
 
-export default function Register() {
+import { AuthForm } from '@components/ui';
+import { getCurrentUser } from '@services/auth';
+
+export default async function Register() {
+  const user = await getCurrentUser();
+
+  if (user) redirect('/');
   return (
     <section className="container">
       <div className="row mt-md-5">
