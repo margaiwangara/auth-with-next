@@ -6,7 +6,7 @@ import { useUserContext } from '@store/ctx';
 import { logoutUser } from '@services/auth';
 
 export default function NavBar() {
-  const { user, setUser } = useUserContext();
+  const { user } = useUserContext();
 
   const router = useRouter();
 
