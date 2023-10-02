@@ -1,5 +1,9 @@
 'use client';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { loginUser, registerUser } from '@services/auth';
 
 type PageProps = 'login' | 'register';
 
@@ -8,11 +12,57 @@ type AuthFormProps = {
 };
 
 export default function AuthForm({ page = 'login' }: AuthFormProps) {
+  const [values, setValues] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const router = useRouter();
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setValues({ ...values, [e.target.name]: e.target.value });
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      const data =
+        page === 'login'
+          ? await loginUser({ email: values.email, password: values.password })
+          : await registerUser(values);
+
+      // check if error exists
+      if (data?.detail) {
+        setError(
+          page === 'login'
+            ? 'Invalid email or password'
+            : 'Oops! Something went wrong',
+        );
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      router.replace('/');
+    } catch (error) {
+      console.log('error', error);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="card">
       <div className="card-header text-capitalize">{page}</div>
       <div className="card-body">
-        <form action="#" method="POST">
+        <form action="#" method="POST" onSubmit={onSubmit}>
+          {error && (
+            <div className="alert alert-dismissible alert-danger">{error}</div>
+          )}
           {page === 'register' && (
             <div className="form-group">
               <label className="form-label" htmlFor="name-field">
@@ -23,6 +73,8 @@ export default function AuthForm({ page = 'login' }: AuthFormProps) {
                 name="name"
                 id="name-field"
                 className="form-control"
+                onChange={onChange}
+                value={values.name}
                 required
               />
             </div>
@@ -36,6 +88,8 @@ export default function AuthForm({ page = 'login' }: AuthFormProps) {
               name="email"
               id="email-field"
               className="form-control"
+              onChange={onChange}
+              value={values.email}
               required
             />
           </div>
@@ -48,10 +102,26 @@ export default function AuthForm({ page = 'login' }: AuthFormProps) {
               name="password"
               id="password-field"
               className="form-control"
+              onChange={onChange}
+              value={values.password}
+              minLength={8}
               required
             />
           </div>
-          <button className="btn btn-primary w-100">Login</button>
+          <button
+            className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+            disabled={loading}
+          >
+            {loading && (
+              <span
+                className="spinner-border spinner-border-sm"
+                style={{ marginRight: 5 }}
+              >
+                <span className="visually-hidden">Loading...</span>
+              </span>
+            )}
+            <span className="text-capitalize">{page}</span>
+          </button>
           <div className="d-flex mt-3 align-items-center">
             <p className="text-muted mb-0">
               {page === 'login' ? 'Not a member?' : 'Already a member?'}
